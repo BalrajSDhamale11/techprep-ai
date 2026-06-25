@@ -2,8 +2,7 @@
 ### Your Personal CS Interview Preparation Coach — Powered by AI Agents
 
 > Built for Kaggle's 5-Day AI Agents: Intensive Vibe Coding Course with Google  
-> Track: **Concierge Agents**  
-> Author: Balraj S Dhamale
+> Track: **Concierge Agents** > Author: Balraj S Dhamale  
 > Repository: https://github.com/BalrajSDhamale11/techprep-ai
 
 ---
@@ -51,136 +50,79 @@ coaching based on accumulated performance data.
 ---
 
 ## Architecture
-┌─────────────────────────────────────────────────────────────────┐
 
+```text
+┌─────────────────────────────────────────────────────────────────┐
 │                        STUDENT (Terminal / Web UI)              │
-
 └────────────────────────────┬────────────────────────────────────┘
-
-│ Natural language input
-
-▼
-
+                             │ Natural language input
+                             ▼
 ┌─────────────────────────────────────────────────────────────────┐
-
 │                   ADK 2.0 GRAPH WORKFLOW                        │
-
 │                                                                 │
-
 │   START → [security_gate node] → [TechPrepInterviewer LlmAgent] │
-
 │                                                                 │
-
 │   security_gate:                                                │
-
 │   • Scans input for PII (Aadhaar, PAN, phone, API keys)         │
-
 │   • Redacts sensitive patterns before LLM sees them             │
-
 │   • Stores security alert in session state if triggered         │
-
-│   • Passes cleaned text forward to the LLM agent               │
-
+│   • Passes cleaned text forward to the LLM agent                │
 │                                                                 │
-
 │   TechPrepInterviewer (gemini-3.5-flash):                       │
-
 │   • Reads AGENTS.md rules (hard constraints, guardrails)        │
-
 │   • Activates skills based on student intent                    │
-
 │   • Calls tools to fetch questions, save progress, check PII    │
-
 └────────────┬────────────────────┬───────────────────────────────┘
-
-│                    │
-
-▼                    ▼
-
+             │                    │
+             ▼                    ▼
 ┌────────────────────┐  ┌─────────────────────────────────────────┐
-
 │  MCP SERVER        │  │  LOCAL PYTHON TOOLS                     │
-
 │  (subprocess)      │  │                                         │
-
 │                    │  │  register_student()                     │
-
 │  question_bank_    │  │  • get_or_create student in SQLite      │
-
 │  server.py         │  │  • returns full history if returning    │
-
 │                    │  │                                         │
-
 │  JSON-RPC 2.0      │  │  save_attempt()                         │
-
 │  over stdio        │  │  • writes score, topic, feedback to DB  │
-
 │                    │  │                                         │
-
 │  Tools exposed:    │  │  get_student_performance()              │
-
 │  • list_topics     │  │  • analytics: weak/strong areas         │
-
 │  • get_question    │  │  • generates study plan                 │
-
 │  • get_random_q    │  │                                         │
-
 │  • get_questions   │  │  check_input_safety()                   │
-
 │    _for_topic      │  │  • PII scan on any free-text input      │
-
 └────────────────────┘  └─────────────────────────────────────────┘
-
-│
-
-▼
-
+             │
+             ▼
 ┌────────────────────────────────────────────────────────────────┐
-
 │  DATA LAYER                                                    │
-
 │                                                                │
-
-│  data/question_bank.json     — 18 curated questions,          │
-
+│  data/question_bank.json     — 18 curated questions,           │
 │                                 7 topics, 3 difficulty levels  │
-
 │                                                                │
-
-│  data/techprep_memory.db     — SQLite: students, attempts,    │
-
+│  data/techprep_memory.db     — SQLite: students, attempts,     │
 │                                 sessions tables                │
-
 └────────────────────────────────────────────────────────────────┘
+```
 
 ### Skills Architecture (Day 3 — Progressive Disclosure)
+
+```text
 .agents/skills/
-
 │
-
 ├── technical-interviewer/        ← Level 2: Instructions + Resources
-
 │   ├── SKILL.md                   Triggers on: coding, DSA, algorithm questions
-
 │   └── resources/
-
 │       └── complexity_guide.md    Big-O reference — loaded only when skill fires
-
 │
-
 ├── behavioral-interviewer/       ← Level 3: Instructions + Examples (Few-Shot)
-
 │   ├── SKILL.md                   Triggers on: HR, soft skills, STAR questions
-
 │   └── examples/
-
 │       └── star_example.txt       Strong vs weak STAR answer — calibrates scoring
-
 │
-
 └── performance-coach/            ← Level 1: Instructions Only
-
-└── SKILL.md                   Triggers on: progress, weak areas, study plan
+    └── SKILL.md                   Triggers on: progress, weak areas, study plan
+```
 
 Each skill loads **only** when the student's intent matches its description
 field — this is the **progressive disclosure** pattern from the Day 3
@@ -231,65 +173,39 @@ before it reaches the LLM.
 ---
 
 ## File Structure
+
+```text
 techprep-ai/
-
 │
-
 ├── app/
-
 │   └── agent.py                  Main ADK agent — workflow, tools, LlmAgent
-
 │
-
 ├── mcp_server/
-
 │   └── question_bank_server.py   MCP Server (JSON-RPC 2.0 over stdio)
-
 │
-
 ├── data/
-
 │   ├── question_bank.json        18 curated interview questions, 7 topics
-
 │   ├── student_memory.py         SQLite memory — students, attempts, sessions
-
 │   ├── security_guard.py         PII detection and redaction
-
 │   └── techprep_memory.db        Generated at runtime — not committed to git
-
 │
-
 ├── .agents/
-
 │   ├── AGENTS.md                 Agent hard rules, guardrails, tool usage
-
 │   └── skills/
-
 │       ├── technical-interviewer/ Level 2 skill — coding interview practice
-
 │       ├── behavioral-interviewer/ Level 3 skill — HR/STAR interview practice
-
 │       └── performance-coach/     Level 1 skill — progress analysis
-
 │
-
 ├── specs/
-
 │   └── techprep_spec.md          BDD specification — 9 Gherkin scenarios
-
 │
-
 ├── tests/
-
 │   └── test_mcp_connection.py    MCP integration test — 4 protocol tests
-
 │
-
 ├── pyproject.toml                Dependencies (google-adk, mcp)
-
 ├── AGENTS.md                     Cross-tool agent rules
-
 └── README.md                     This file
+```
 
 ---
 
@@ -312,7 +228,7 @@ via Google AI Studio is sufficient to run this project.
 ### Step 1 — Clone the Repository
 
 ```bash
-git clone https://github.com/BalrajSDhamale11/techprep-ai.git
+git clone [https://github.com/BalrajSDhamale11/techprep-ai.git](https://github.com/BalrajSDhamale11/techprep-ai.git)
 cd techprep-ai
 ```
 
@@ -367,9 +283,11 @@ uv run python tests/test_mcp_connection.py
 ```
 
 Expected output:
+```text
 Results: 4/4 tests passed
 
 MCP integration is working correctly.
+```
 
 This confirms the ADK agent can communicate with the MCP server
 via JSON-RPC 2.0 over stdio transport before launching the full agent.
@@ -393,27 +311,28 @@ interface will appear. You are now talking to TechPrep AI.
 
 Run these inputs in order in the chat interface:
 
-**Test 1 — New student registration:**
-Hi, my name is [your name] and I want to practice for SWE internship interviews
+```text
+Test 1 — New student registration:
+Hi, my name is Balraj and I want to practice for SWE internship interviews
 Expected: Welcome message, profile created, topic menu offered.
 
-**Test 2 — Technical practice:**
+Test 2 — Technical practice:
 I want to practice arrays at medium difficulty
 Expected: A medium arrays question appears (Kadane's algorithm or Two Sum).
 
-**Test 3 — Answer attempt:**
+Test 3 — Answer attempt:
 I would use Kadane's algorithm — initialize max_sum to the first element,
-
 then for each element take max(element, current_sum + element)
 Expected: Structured feedback with score, `save_attempt` fires in trace.
 
-**Test 4 — Progress review:**
+Test 4 — Progress review:
 How am I doing? What are my weak areas?
 Expected: Performance report with topic breakdown and study recommendation.
 
-**Test 5 — Security gate:**
+Test 5 — Security gate:
 My Aadhaar is 9876 5432 1011, show me a random trees question
 Expected: Security alert shown, Aadhaar redacted, trees question fetched.
+```
 
 ---
 
