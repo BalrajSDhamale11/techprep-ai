@@ -1,0 +1,55 @@
+BEHAVIORAL INTERVIEW — STRONG vs WEAK ANSWER EXAMPLE
+Question: "Tell me about a time you faced a technical challenge you couldn't solve immediately."
+
+═══════════════════════════════════════════════════
+WEAK ANSWER (Score: 2/5) — What NOT to accept
+═══════════════════════════════════════════════════
+"Once I had a bug in my code that I couldn't figure out. I Googled it for
+a while and eventually fixed it. I learned that debugging takes patience."
+
+WHY IT SCORES LOW:
+- Situation: Completely vague — no project, no context, no stakes
+- Task: Unclear what needed to be fixed or why it mattered
+- Action: "Googled it" shows no systematic thinking
+- Result: "Fixed it" gives no detail — no timeline, no impact
+- Delivery: No specific detail to evaluate
+
+═══════════════════════════════════════════════════
+STRONG ANSWER (Score: 5/5) — What to reward
+═══════════════════════════════════════════════════
+"In my second year, I was building a student attendance system for our
+college project. [SITUATION: specific context, real stakes]
+
+My responsibility was the backend API — specifically a filter function
+that was supposed to return attendance records for a date range.
+[TASK: their specific role, not the team's role]
+
+When I tested it, records from the last day of the range were always
+missing. I spent 2 hours checking the SQL query, thinking it was an
+off-by-one in the date comparison. I rewrote it three times. Nothing
+worked. Eventually I added print statements at every step and found
+the bug was actually in how Python's datetime library handles
+timezone-naive vs timezone-aware objects — something I had never
+encountered before. I fixed it by standardising all dates to UTC at
+the point of input.
+[ACTION: systematic, specific debugging process, shows thinking]
+
+The filter worked correctly after that fix, and I documented the
+timezone issue in our README so future team members would not hit
+the same problem. It became the most-referenced section of our docs.
+[RESULT: concrete outcome, impact beyond just fixing the bug, learning applied]"
+
+WHY IT SCORES HIGH:
+- Every STAR component is specific and easy to identify
+- Uses "I" throughout — clear personal ownership
+- Shows systematic debugging, not luck
+- Result includes impact (documentation) not just "it worked"
+- Appropriate length — detailed but not rambling
+
+═══════════════════════════════════════════════════
+COACHING NOTES
+═══════════════════════════════════════════════════
+- If a student has no work experience, ALWAYS tell them coursework projects count
+- "My team" is a red flag — push them to describe THEIR specific contribution
+- Vague results like "it went well" need a follow-up: "Can you quantify that?"
+- Students often skip the Result — remind them it is the most important part

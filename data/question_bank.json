@@ -1,0 +1,294 @@
+{
+  "topics": {
+    "arrays": "Array and list manipulation — indexing, two pointers, sliding window",
+    "strings": "String processing — palindromes, substrings, pattern matching",
+    "linked_lists": "Linked list operations — traversal, reversal, cycle detection",
+    "trees": "Binary trees and BST — traversal, height, search operations",
+    "dynamic_programming": "Optimization using memoization and tabulation",
+    "sorting": "Sorting algorithms — time/space complexity and implementation",
+    "behavioral": "HR and behavioral interview questions using the STAR method"
+  },
+  "questions": [
+    {
+      "id": "arr_001",
+      "topic": "arrays",
+      "difficulty": "easy",
+      "type": "coding",
+      "question": "Given an array of integers and a target number, find two numbers in the array that add up to the target. Return their indices. Assume exactly one solution exists and you cannot use the same element twice. Example: array = [2, 7, 11, 15], target = 9, output = [0, 1] because array[0] + array[1] = 9.",
+      "follow_up": "Your first solution likely works but might be O(n²). Can you solve this in a single pass using O(n) time?",
+      "key_points": [
+        "Brute force: nested loops, O(n²) time, O(1) space",
+        "Optimal: hash map storing value→index, check if complement exists, O(n) time",
+        "Walk through: for each element, check if (target - element) is already in the map"
+      ],
+      "sample_answer": "Use a hash map. Iterate once through the array. For each element, calculate its complement (target - current). If complement is in the map, return [map[complement], current_index]. Otherwise, add current element and its index to the map. This is O(n) time and O(n) space."
+    },
+    {
+      "id": "arr_002",
+      "topic": "arrays",
+      "difficulty": "medium",
+      "type": "coding",
+      "question": "Given an integer array, find the contiguous subarray (containing at least one number) which has the largest sum and return that sum. Example: array = [-2, 1, -3, 4, -1, 2, 1, -5, 4], output = 6. The subarray [4, -1, 2, 1] has the largest sum.",
+      "follow_up": "Can you also return the actual subarray, not just the sum? What changes?",
+      "key_points": [
+        "This is Kadane's Algorithm",
+        "Track current_sum and max_sum",
+        "If current_sum goes negative, reset it to 0 (start fresh)",
+        "Update max_sum after each element"
+      ],
+      "sample_answer": "Kadane's Algorithm: Initialize max_sum and current_sum to the first element. For each subsequent element, current_sum = max(element, current_sum + element). Update max_sum = max(max_sum, current_sum). Return max_sum. O(n) time, O(1) space."
+    },
+    {
+      "id": "arr_003",
+      "topic": "arrays",
+      "difficulty": "hard",
+      "type": "coding",
+      "question": "Given n non-negative integers representing an elevation map where each bar has width 1, compute how much water it can trap after raining. Example: height = [0,1,0,2,1,0,1,3,2,1,2,1], output = 6 units of water.",
+      "follow_up": "The two-pointer approach uses O(1) space. Can you explain why it works?",
+      "key_points": [
+        "Water at any index = min(max_left, max_right) - height[index]",
+        "Brute force: for each index compute max left and max right — O(n²)",
+        "Optimized: precompute left_max[] and right_max[] arrays — O(n) time O(n) space",
+        "Best: two pointer approach — left and right pointers, O(n) time O(1) space"
+      ],
+      "sample_answer": "Two-pointer solution: Use left and right pointers from both ends. Track left_max and right_max. If left_max < right_max, water trapped at left = left_max - height[left], move left pointer right. Otherwise process right side similarly. This works because the water level is determined by the smaller of the two maximums."
+    },
+    {
+      "id": "str_001",
+      "topic": "strings",
+      "difficulty": "easy",
+      "type": "conceptual",
+      "question": "Write a function to check if a given string is a palindrome. A palindrome reads the same forwards and backwards. Spaces and punctuation should be ignored, and the check should be case-insensitive. Example: 'A man a plan a canal Panama' → True. 'race a car' → False.",
+      "follow_up": "What is the time and space complexity of your solution? Can you do it with O(1) extra space?",
+      "key_points": [
+        "Clean the string: remove non-alphanumeric characters, convert to lowercase",
+        "Two-pointer approach: compare characters from both ends moving inward",
+        "Alternative: reverse the cleaned string and compare",
+        "O(n) time, O(1) extra space with two-pointer"
+      ],
+      "sample_answer": "Clean the input by filtering to alphanumeric characters and lowercasing. Use two pointers (left starting at 0, right starting at end). While left < right, compare characters. If they differ, return False. If they match, move both pointers inward. If loop completes, return True."
+    },
+    {
+      "id": "str_002",
+      "topic": "strings",
+      "difficulty": "medium",
+      "type": "coding",
+      "question": "Given a string s, find the length of the longest substring without repeating characters. Example: s = 'abcabcbb', output = 3 (the substring 'abc'). s = 'bbbbb', output = 1 (the substring 'b').",
+      "follow_up": "What data structure makes this solution efficient? What is the time complexity?",
+      "key_points": [
+        "Sliding window technique",
+        "Use a set to track characters in current window",
+        "Left and right pointers define the window",
+        "When duplicate found, shrink window from left until duplicate is removed",
+        "O(n) time, O(min(n, alphabet_size)) space"
+      ],
+      "sample_answer": "Use sliding window with a set. Maintain a window [left, right]. Expand right pointer, adding characters to set. When a duplicate is found, shrink from left (removing characters from set) until the duplicate is gone. Track max window size throughout. O(n) time."
+    },
+    {
+      "id": "ll_001",
+      "topic": "linked_lists",
+      "difficulty": "easy",
+      "type": "coding",
+      "question": "Given the head of a singly linked list, reverse the list and return the new head. Example: Input: 1→2→3→4→5, Output: 5→4→3→2→1. You must do this in place without using extra data structures.",
+      "follow_up": "Can you also write a recursive version? Which do you prefer and why?",
+      "key_points": [
+        "Iterative: use prev=None, current=head, next_node",
+        "In each step: save next_node, set current.next = prev, move prev and current forward",
+        "Recursive: base case is empty list or single node",
+        "O(n) time, O(1) space for iterative, O(n) space for recursive due to call stack"
+      ],
+      "sample_answer": "Iterative approach: Initialize prev=None, current=head. While current is not None: save next_node = current.next, set current.next = prev, set prev = current, set current = next_node. Return prev as the new head. Three pointer technique — simple and O(1) space."
+    },
+    {
+      "id": "ll_002",
+      "topic": "linked_lists",
+      "difficulty": "medium",
+      "type": "coding",
+      "question": "Given the head of a linked list, determine if the linked list has a cycle in it. A cycle exists if a node can be reached again by continuously following the next pointer. Return True if there is a cycle, False otherwise. Do not use extra memory.",
+      "follow_up": "Can you also find where the cycle begins, not just whether it exists?",
+      "key_points": [
+        "Floyd's Cycle Detection Algorithm (Tortoise and Hare)",
+        "Slow pointer moves 1 step, fast pointer moves 2 steps",
+        "If they meet, there is a cycle. If fast reaches None, no cycle",
+        "O(n) time, O(1) space — no hash set needed"
+      ],
+      "sample_answer": "Use Floyd's algorithm: Initialize slow = head, fast = head. While fast and fast.next are not None: move slow one step, move fast two steps. If slow == fast at any point, there is a cycle — return True. If the loop ends, return False. This is the classic tortoise and hare approach."
+    },
+    {
+      "id": "tree_001",
+      "topic": "trees",
+      "difficulty": "easy",
+      "type": "coding",
+      "question": "Given the root of a binary tree, return its maximum depth. The maximum depth is the number of nodes along the longest path from the root node down to the farthest leaf node. Example: tree [3,9,20,null,null,15,7] has depth 3.",
+      "follow_up": "What is the difference between depth-first and breadth-first approaches for this problem?",
+      "key_points": [
+        "Recursive DFS: depth = 1 + max(depth(left), depth(right))",
+        "Base case: None node returns 0",
+        "Iterative BFS: use a queue, count levels",
+        "O(n) time where n is number of nodes, O(h) space where h is height"
+      ],
+      "sample_answer": "Recursive solution: if root is None, return 0. Otherwise return 1 + max(maxDepth(root.left), maxDepth(root.right)). The recursion naturally computes the longest path by taking the maximum of both subtrees at every level."
+    },
+    {
+      "id": "tree_002",
+      "topic": "trees",
+      "difficulty": "medium",
+      "type": "coding",
+      "question": "Given the root of a binary tree, return the level order traversal of its nodes values (i.e., from left to right, level by level). Example: tree [3,9,20,null,null,15,7] → [[3],[9,20],[15,7]].",
+      "follow_up": "How would you modify this to return the zigzag level order traversal (alternating left-to-right and right-to-left)?",
+      "key_points": [
+        "Use a queue (BFS) — collections.deque in Python",
+        "Process nodes level by level",
+        "Track level size: before processing each level, record len(queue)",
+        "Append each level's values as a sublist to result",
+        "O(n) time and space"
+      ],
+      "sample_answer": "Use BFS with a deque. Start with root in queue. While queue is not empty: record current level size, process exactly that many nodes (each level), for each node add its value to current level list and add its children to queue. Append each level list to result. Return result."
+    },
+    {
+      "id": "dp_001",
+      "topic": "dynamic_programming",
+      "difficulty": "medium",
+      "type": "coding",
+      "question": "You are climbing a staircase. It takes n steps to reach the top. Each time you can climb 1 or 2 steps. In how many distinct ways can you climb to the top? Example: n=2, output=2 (1+1 or 2). n=3, output=3 (1+1+1, 1+2, or 2+1).",
+      "follow_up": "How does this relate to the Fibonacci sequence? What are the different ways to implement this: recursion, memoization, tabulation, and space-optimized tabulation?",
+      "key_points": [
+        "This IS Fibonacci: ways(n) = ways(n-1) + ways(n-2)",
+        "Base cases: ways(1) = 1, ways(2) = 2",
+        "Naive recursion is O(2^n) — exponential",
+        "Memoization or tabulation brings it to O(n) time",
+        "Space optimized: only need previous two values, O(1) space"
+      ],
+      "sample_answer": "Space-optimized DP: Initialize prev2=1 (for step 1), prev1=2 (for step 2). For each step from 3 to n: current = prev1 + prev2, then update prev2=prev1, prev1=current. Return prev1. O(n) time, O(1) space. This works because to reach step n, you came from step n-1 or n-2."
+    },
+    {
+      "id": "dp_002",
+      "topic": "dynamic_programming",
+      "difficulty": "hard",
+      "type": "coding",
+      "question": "Given two strings text1 and text2, return the length of their longest common subsequence (LCS). A subsequence is a sequence that can be derived from another string by deleting some characters without changing the order of remaining characters. Example: text1='abcde', text2='ace', output=3 (the LCS is 'ace').",
+      "follow_up": "How would you reconstruct the actual LCS string, not just its length?",
+      "key_points": [
+        "2D DP table: dp[i][j] = LCS of text1[:i] and text2[:j]",
+        "If text1[i-1] == text2[j-1]: dp[i][j] = dp[i-1][j-1] + 1",
+        "Else: dp[i][j] = max(dp[i-1][j], dp[i][j-1])",
+        "O(m*n) time and space where m,n are string lengths",
+        "For reconstruction, trace back through the DP table"
+      ],
+      "sample_answer": "Build a 2D DP table of size (m+1)×(n+1) initialized to 0. For each pair of characters (i,j): if they match, dp[i][j] = dp[i-1][j-1]+1. Otherwise dp[i][j] = max(dp[i-1][j], dp[i][j-1]). Return dp[m][n]. The recurrence works because matching characters extend a shorter LCS, while mismatches take the best of skipping one character from either string."
+    },
+    {
+      "id": "sort_001",
+      "topic": "sorting",
+      "difficulty": "easy",
+      "type": "conceptual",
+      "question": "Explain the difference between Bubble Sort and Selection Sort. For each: describe the algorithm, state the time complexity in best, average, and worst cases, and state the space complexity. Which is better and when?",
+      "follow_up": "When would you ever use O(n²) sorting algorithms in real life instead of O(n log n) algorithms?",
+      "key_points": [
+        "Bubble Sort: compare adjacent elements, swap if out of order, O(n²) worst, O(n) best (with optimization)",
+        "Selection Sort: find minimum in remaining array, place it, O(n²) always",
+        "Both are O(1) space — in-place sorting",
+        "Bubble Sort can detect already-sorted arrays; Selection Sort cannot",
+        "Use O(n²) for very small arrays or nearly sorted data where constants matter"
+      ],
+      "sample_answer": "Bubble Sort repeatedly swaps adjacent elements. With optimization (stop if no swap in a pass), best case is O(n) for already-sorted arrays. Worst/average is O(n²). Selection Sort finds the minimum each pass — always O(n²) regardless of input. Both are O(1) space. For n < 20 or nearly sorted data, these simple algorithms often outperform O(n log n) algorithms due to lower constant factors."
+    },
+    {
+      "id": "sort_002",
+      "topic": "sorting",
+      "difficulty": "medium",
+      "type": "coding",
+      "question": "Implement Merge Sort for an array of integers. Explain how it works, implement it, analyze its time and space complexity, and explain why it is preferred over Quick Sort in certain situations.",
+      "follow_up": "Merge Sort is O(n log n) but uses O(n) extra space. What is an in-place merge sort, and what is the tradeoff?",
+      "key_points": [
+        "Divide: split array into halves recursively until single elements",
+        "Conquer: merge two sorted halves into one sorted array",
+        "O(n log n) time always — best, average, worst all equal",
+        "O(n) extra space for the merge step",
+        "Stable sort — preserves relative order of equal elements",
+        "Preferred for linked lists (no random access needed) and external sorting"
+      ],
+      "sample_answer": "Merge sort: if array length <= 1, return. Split into left and right halves. Recursively sort both halves. Merge: use two pointers on sorted halves, compare elements and pick the smaller one, append remaining elements. O(n log n) time because we have log n levels of recursion and O(n) work per level. O(n) space for auxiliary array. Preferred over Quick Sort when stable sorting is needed or for linked lists."
+    },
+    {
+      "id": "beh_001",
+      "topic": "behavioral",
+      "difficulty": "general",
+      "type": "behavioral",
+      "question": "Tell me about yourself. Give a 90-second professional introduction covering who you are, your academic background, a relevant project or experience, and why you are excited about this role.",
+      "follow_up": "How does your academic coursework specifically prepare you for the challenges of this role?",
+      "key_points": [
+        "Structure: Education → Skills/Projects → Why this role",
+        "Keep it under 90 seconds — practice timing",
+        "Lead with your strongest credential",
+        "Connect your background to what the company values",
+        "End with genuine enthusiasm for the specific role"
+      ],
+      "sample_answer": "Strong answer structure: 'I'm [Name], a [Year] year [Degree] student at [College] specializing in [Area]. During my studies, I built [specific project] using [technologies] which [outcome]. I've also [relevant experience/coursework]. I'm particularly excited about this role at [Company] because [specific reason connecting your skills to their work].'"
+    },
+    {
+      "id": "beh_002",
+      "topic": "behavioral",
+      "difficulty": "general",
+      "type": "behavioral",
+      "question": "Describe a time you faced a significant technical challenge or a bug you could not solve initially. Walk me through what the problem was, what you tried, what you learned, and how you eventually resolved it.",
+      "follow_up": "What would you do differently if you faced the same challenge today?",
+      "key_points": [
+        "Use the STAR method: Situation, Task, Action, Result",
+        "Be specific — name the technology and the actual problem",
+        "Show your debugging process, not just the solution",
+        "Demonstrate intellectual honesty — it is okay to say you were stuck",
+        "The learning is more important than the solution to interviewers"
+      ],
+      "sample_answer": "Strong STAR answer: Situation (what project, what broke), Task (what you needed to fix and why it mattered), Action (specific debugging steps: logs checked, tools used, people consulted, approaches tried), Result (how it was resolved, how long it took, what you learned). Avoid vague answers like 'I Googled it and fixed it.'"
+    },
+    {
+      "id": "beh_003",
+      "topic": "behavioral",
+      "difficulty": "general",
+      "type": "behavioral",
+      "question": "Tell me about a time you worked in a team where there was a disagreement or conflict. What was the disagreement about, how did you handle it, and what was the outcome?",
+      "follow_up": "Looking back, would you handle the situation differently today? What did this experience teach you about collaboration?",
+      "key_points": [
+        "Avoid blaming the other person — focus on the conflict, not the character",
+        "Show that you sought to understand their perspective first",
+        "Demonstrate communication and empathy",
+        "The outcome should show growth or a positive resolution",
+        "If no team projects, use a classroom group project example"
+      ],
+      "sample_answer": "Describe: the specific disagreement (technical approach, workload, timeline), how you approached the conversation (private, respectful, listening first), the compromise or resolution reached, and what the final project outcome was. Show that you value both relationships and results. Interviewers want to see maturity and emotional intelligence."
+    },
+    {
+      "id": "beh_004",
+      "topic": "behavioral",
+      "difficulty": "general",
+      "type": "behavioral",
+      "question": "Why did you choose Computer Science? And why are you specifically interested in a software engineering role rather than other CS paths like research, data science, or systems engineering?",
+      "follow_up": "If you could only work on one type of problem for the next 5 years, what would it be and why?",
+      "key_points": [
+        "Be genuine — interviewers detect rehearsed non-answers immediately",
+        "Connect your choice to a specific experience or moment",
+        "Show self-awareness about your strengths and preferences",
+        "Distinguish software engineering from other CS paths specifically",
+        "Express genuine intellectual curiosity, not just career motives"
+      ],
+      "sample_answer": "Authentic answers reference a specific moment: a first program that worked, a problem you automated, something you built that others used. Connect it to why you specifically want software engineering: you enjoy building things people interact with, you like the feedback loop of shipping code, you find system design intellectually stimulating. Be specific rather than generic."
+    },
+    {
+      "id": "beh_005",
+      "topic": "behavioral",
+      "difficulty": "general",
+      "type": "behavioral",
+      "question": "Describe a project you are most proud of — from your coursework, personal projects, or internship. What was the project, what was your specific contribution, what technical decisions did you make, and what would you improve if you rebuilt it today?",
+      "follow_up": "How did you handle scope creep or changing requirements during this project?",
+      "key_points": [
+        "Pick a project that genuinely excites you — enthusiasm is contagious",
+        "Be clear about YOUR contribution vs. team contribution",
+        "Explain at least one non-obvious technical decision and why you made it",
+        "The 'what I would improve' answer shows maturity and growth mindset",
+        "Have metrics or concrete outcomes if possible: 'it reduced processing time by 40%'"
+      ],
+      "sample_answer": "Strong format: Project name and one-sentence summary → the specific technical problem it solved → your architecture choices and why → one decision you are particularly proud of → what you learned → what you would change (more thorough testing, better documentation, different data structure). End with the outcome and its impact on users or grades."
+    }
+  ]
+}
