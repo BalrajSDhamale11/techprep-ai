@@ -21,7 +21,7 @@ import sys
 import os
 import re
 from pathlib import Path
-from datetime import datetime
+from datetime import datetime, timezone
 
 # ── PATH SETUP ─────────────────────────────────────────────────────────────────
 PROJECT_ROOT = Path(__file__).parent.parent.parent
@@ -359,7 +359,7 @@ def run_evaluation():
     print(f"Dataset: {DATASET_PATH.name}")
     print(f"Test cases: {len(test_cases)}")
     print(f"Judge model: {JUDGE_MODEL}")
-    print(f"Timestamp: {datetime.utcnow().strftime('%Y-%m-%d %H:%M UTC')}")
+    print(f"Timestamp: {datetime.now(timezone.utc).strftime('%Y-%m-%d %H:%M UTC')}")
     print("=" * 60)
     print()
 
@@ -444,7 +444,7 @@ def run_evaluation():
     pass_rate      = round(passed / n * 100, 1)
 
     summary = {
-        "run_timestamp": datetime.utcnow().strftime("%Y-%m-%d %H:%M UTC"),
+        "run_timestamp": datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M UTC"),
         "total_tests": n,
         "passed": passed,
         "failed": n - passed,
@@ -472,7 +472,7 @@ def run_evaluation():
     print("=" * 60)
 
     # ── Save results ────────────────────────────────────────────────────────────
-    results_file = RESULTS_DIR / f"eval_results_{datetime.utcnow().strftime('%Y%m%d_%H%M')}.json"
+    results_file = RESULTS_DIR / f"eval_results_{datetime.now(timezone.utc).strftime('%Y%m%d_%H%M')}.json"
     with open(results_file, "w", encoding="utf-8") as f:
         json.dump(summary, f, indent=2)
 
