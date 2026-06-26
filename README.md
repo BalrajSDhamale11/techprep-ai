@@ -411,7 +411,46 @@ folder — behavioral-interviewer with STAR scoring calibration). This shows
 progressive mastery of the skill authoring system, not just checkbox compliance.
 
 ---
+## Evaluation Results
 
+Evaluated using the **LLM-as-Judge** methodology from Day 3 (Evaluation-Driven
+Development). Each test case is scored on two independent dimensions:
+
+- **Trajectory Score**: Did the agent call the correct tools in the correct order?
+- **Quality Score**: Did the agent's behavior match all expected behaviors?
+
+Run the evaluation yourself: `uv run python tests/eval/run_eval.py`
+
+| Test Case | Category | Trajectory | Quality | Overall | Result |
+|---|---|---|---|---|---|
+| MCP Question Delivery (Arrays Medium) | MCP Integration | 5/5 | 5/5 | 5/5 | ✅ PASS |
+| Memory System — Student Registration | Memory | 5/5 | 5/5 | 5/5 | ✅ PASS |
+| Security Gate — PII Redaction | Security | 5/5 | 5/5 | 5/5 | ✅ PASS |
+| Performance Coach Skill | Agent Skills | 5/5 | 5/5 | 5/5 | ✅ PASS |
+| Behavioral Interviewer — STAR Method | Agent Skills | 5/5 | 3/5 | 3/5 | ✅ PASS |
+
+**Average Trajectory Score: 5.0/5 | Average Quality Score: 4.6/5 | Pass Rate: 5/5 (100%)**
+
+### Evaluation Notes
+
+**TC_005 Quality Score (3/5):** The behavioral question was fetched correctly via
+the MCP server and the STAR method was referenced. The quality gap was identified
+by the judge as: the agent did not explicitly introduce all four STAR components
+before presenting the question. This is a known improvement area — the
+`behavioral-interviewer` skill's opening protocol can be strengthened by adding
+an explicit STAR component breakdown before every first behavioral question.
+
+**Automatic model fallback:** The evaluation runner includes a fallback chain
+(`gemini-3.5-flash → gemini-2.5-flash → gemini-3.1-flash-lite`) to handle
+503 high-demand errors without blocking the eval run. TC_005 triggered this
+fallback and was successfully evaluated on `gemini-2.5-flash`.
+
+**Two-dimension scoring rationale:** Trajectory scoring catches the "deleted test"
+failure mode described in the Day 4 whitepaper — an agent can produce correct
+output through wrong steps. Evaluating both the path and the result provides a
+stronger quality signal than output-only scoring.
+
+---
 ## Limitations and Future Work
 
 - **Question bank:** 18 questions across 7 topics. Production would require

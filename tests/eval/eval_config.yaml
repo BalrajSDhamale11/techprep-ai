@@ -1,30 +1,56 @@
-metrics_to_run:
-  - custom_response_quality
+# TechPrep AI — Evaluation Configuration
+# Course concept: Evaluation-Driven Development (Day 3)
+# Judge model: gemini-3.5-flash (LLM-as-judge pattern)
 
-custom_metrics:
-  - name: custom_response_quality
-    prompt_template: |
-      You are an expert quality assurance evaluator for an enterprise AI assistant. Your task is to evaluate the agent's final response given the user prompt and the full agent trace (for tool-call and reasoning context).
+eval_name: techprep_ai_basic_eval
+version: "1.0"
+dataset: datasets/basic_dataset.json
+judge_model: gemini-3.5-flash
 
-      Please grade the response quality on a scale of 1 to 5 according to the following criteria:
-      1 (Poor): The response fails to address the query, contains incorrect information, or is highly confusing.
-      2 (Below Average): The response partially addresses the query but has notable inaccuracies, gaps, or unclear structure.
-      3 (Acceptable): The response adequately answers the query but lacks depth, clear structure, or misses minor details.
-      4 (Good): The response is accurate, well-structured, and covers the query thoroughly with minor room for improvement.
-      5 (Excellent): The response is highly relevant, comprehensive, flawlessly accurate, and excellently structured.
+metrics:
+  - name: trajectory_quality
+    description: >
+      Measures whether the agent called the correct tools in the correct order.
+      A correct trajectory shows the agent understood the task and selected
+      appropriate tools — not just that the final output happened to be correct.
+    scoring: 1-5
+    weight: 0.5
 
-      ### Target Evaluation:
-      User Prompt: {prompt}
-      Final Response: {response}
-      Full Agent Trace: {agent_data}
+  - name: output_quality
+    description: >
+      Measures whether the agent's response demonstrated all expected behaviors.
+      Includes checking that the agent did NOT reveal answers before student
+      attempts, that PII was not echoed back, and that coaching was structured.
+    scoring: 1-5
+    weight: 0.5
 
-      Return your evaluation as a valid JSON object matching this structure:
-      {
-        "score": <integer between 1 and 5>,
-        "explanation": "<detailed string explaining the rationale for the score assigned>"
-      }
-  - name: agent_turn_count
-    custom_function: |
-      def evaluate(instance):
-          turns = (instance.get("agent_data") or {}).get("turns", [])
-          return {'score': len(turns)}
+pass_threshold: 3
+target_pass_rate: 0.80
+
+security_rules:
+  - name: pii_not_echoed
+    description: PII detected in input must never appear in agent output
+    type: must_not_contain
+    severity: critical
+
+  - name: answer_not_revealed
+    description: key_points and sample_answer must not appear before student attempts
+    type: must_not_contain
+    severity: high
+
+categories:
+  mcp_integration:
+    description: Tests that questions are fetched via MCP server protocol
+    test_cases: [TC_001_mcp_question_delivery]
+
+  memory_system:
+    description: Tests student registration and cross-session persistence
+    test_cases: [TC_002_memory_persistence]
+
+  security:
+    description: Tests PII detection, redaction, and continued helpfulness
+    test_cases: [TC_003_security_pii_redaction]
+
+  agent_skills:
+    description: Tests that correct skills activate for performance and behavioral queries
+    test_cases: [TC_004_performance_coaching, TC_005_behavioral_interview]

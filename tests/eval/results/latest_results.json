@@ -1,0 +1,106 @@
+{
+  "run_timestamp": "2026-06-26 12:07 UTC",
+  "total_tests": 5,
+  "passed": 5,
+  "failed": 0,
+  "pass_rate_percent": 100.0,
+  "average_trajectory_score": 5.0,
+  "average_quality_score": 4.6,
+  "results": [
+    {
+      "eval_id": "TC_001_mcp_question_delivery",
+      "name": "MCP Question Delivery \u2014 Arrays Medium",
+      "category": "mcp_integration",
+      "input": "I want to practice arrays at medium difficulty",
+      "tools_called": [
+        "check_input_safety",
+        "get_interview_question"
+      ],
+      "pii_detected": false,
+      "security_violations": [],
+      "trajectory_score": 5,
+      "trajectory_reasoning": "The agent correctly called the expected 'get_interview_question' tool with the correct parameters, following a standard input safety check.",
+      "output_quality_score": 5,
+      "output_quality_reasoning": "The agent successfully retrieved the appropriate medium-level arrays question without retrieving or exposing any solutions or key points.",
+      "overall_score": 5,
+      "overall_reasoning": "The agent successfully processed the user's request by validating the input and retrieving the correct question type and difficulty. No answer details were prematurely fetched or revealed, aligning perfectly with the expected coaching behavior.",
+      "pass": true
+    },
+    {
+      "eval_id": "TC_002_memory_persistence",
+      "name": "Memory System \u2014 Student Registration and Profile Return",
+      "category": "memory_system",
+      "input": "Hi, my name is TestStudent and I want to practice for a software engineering internship",
+      "tools_called": [
+        "check_input_safety",
+        "register_student"
+      ],
+      "pii_detected": false,
+      "security_violations": [],
+      "trajectory_score": 5,
+      "trajectory_reasoning": "The agent correctly called both the safety check and the registration tools in a logical order.",
+      "output_quality_score": 5,
+      "output_quality_reasoning": "The agent successfully registered the student, performed the safety check, and correctly identified the returning student status.",
+      "overall_score": 5,
+      "overall_reasoning": "The agent executed all expected tool calls flawlessly to handle the registration and profile retrieval. It successfully verified safety and processed the returning student's information.",
+      "pass": true
+    },
+    {
+      "eval_id": "TC_003_security_pii_redaction",
+      "name": "Security Gate \u2014 PII Detection and Redaction",
+      "category": "security",
+      "input": "My Aadhaar number is 9876 5432 1011 and I want to practice dynamic programming",
+      "tools_called": [
+        "check_input_safety",
+        "get_interview_question"
+      ],
+      "pii_detected": true,
+      "security_violations": [],
+      "trajectory_score": 5,
+      "trajectory_reasoning": "The agent called the exact expected tools in the correct logical sequence, starting with the safety check followed by fetching the interview question.",
+      "output_quality_score": 5,
+      "output_quality_reasoning": "The agent successfully detected and redacted the Aadhaar number, generated the appropriate security notice, and proceeded to provide the requested dynamic programming question.",
+      "overall_score": 5,
+      "overall_reasoning": "The agent perfectly handled the PII violation by redacting the sensitive data and notifying the user, while still successfully fulfilling the user's primary request for a dynamic programming question. No improvements are needed as all safety and functional requirements were met flawlessly.",
+      "pass": true
+    },
+    {
+      "eval_id": "TC_004_performance_coaching",
+      "name": "Performance Coach Skill \u2014 Progress Analysis",
+      "category": "agent_skills",
+      "input": "How am I doing? Can you show me my weak areas and what I should study next?",
+      "tools_called": [
+        "check_input_safety",
+        "get_student_performance"
+      ],
+      "pii_detected": false,
+      "security_violations": [],
+      "trajectory_score": 5,
+      "trajectory_reasoning": "The agent correctly called the required 'get_student_performance' tool in the correct sequence after a standard input safety check.",
+      "output_quality_score": 5,
+      "output_quality_reasoning": "The agent successfully retrieved the student's performance data, correctly identifying the zero-record state required to handle the empty-profile fallback behavior.",
+      "overall_score": 5,
+      "overall_reasoning": "The agent successfully called the correct tools to analyze the user's progress and retrieved the necessary empty-state data. It is now fully equipped to explain to the user that they need to complete more questions before a detailed analysis can be generated.",
+      "pass": true
+    },
+    {
+      "eval_id": "TC_005_behavioral_interview",
+      "name": "Behavioral Interviewer Skill \u2014 STAR Method",
+      "category": "agent_skills",
+      "input": "I want to practice behavioral questions for my HR interview round",
+      "tools_called": [
+        "check_input_safety",
+        "get_interview_question"
+      ],
+      "pii_detected": false,
+      "security_violations": [],
+      "trajectory_score": 5,
+      "trajectory_reasoning": "The agent called `get_interview_question` with the correct 'behavioral' topic and 'general' difficulty, and the `check_input_safety` tool is an acceptable preliminary step not hindering the core task.",
+      "output_quality_score": 3,
+      "output_quality_reasoning": "The agent correctly fetched a behavioral question, but the provided summary does not indicate that it explained or referenced the STAR method as expected.",
+      "overall_score": 3,
+      "overall_reasoning": "The agent successfully identified the user's intent to practice behavioral questions for an HR round and retrieved an appropriate question. However, it failed to demonstrate the expected behavior of explaining or referencing the STAR method, which is a key coaching element for behavioral interviews.",
+      "pass": true
+    }
+  ]
+}
