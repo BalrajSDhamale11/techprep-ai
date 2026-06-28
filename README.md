@@ -463,6 +463,9 @@ stronger quality signal than output-only scoring.
   make practice feel more realistic.
 - **Multi-student sessions:** Currently single-user. A session management
   layer would enable group interview practice with peer feedback.
+- **MCP connection per call:** The current implementation spawns a fresh subprocess
+  per MCP call for architectural simplicity. A production deployment would maintain
+  a persistent connection pool, reducing per-call overhead from ~200ms to ~5ms.
 
 ---
 
