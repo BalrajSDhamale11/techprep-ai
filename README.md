@@ -1,10 +1,22 @@
 # TechPrep AI 🎯
 ### Your Personal CS Interview Preparation Coach — Powered by AI Agents
 
-> Built for Kaggle's 5-Day AI Agents: Intensive Vibe Coding Course with Google  
-> Track: **Concierge Agents** > Author: Balraj S Dhamale  
+![Python](https://img.shields.io/badge/Python-3.12-blue)
+![Google ADK](https://img.shields.io/badge/Google_ADK-2.0-orange)
+![MCP](https://img.shields.io/badge/Protocol-MCP_JSON--RPC_2.0-purple)
+![Eval Pass Rate](https://img.shields.io/badge/Eval_Pass_Rate-100%25-brightgreen)
+![License](https://img.shields.io/badge/License-MIT-green)
+
+
+> Built for Kaggle's 5-Day AI Agents: Intensive Vibe Coding Course with Google
+
+> Track: **Concierge Agents**
+
+> Author: Balraj S Dhamale
+
 > Repository: https://github.com/BalrajSDhamale11/techprep-ai
 
+> **Video Demo:** https://youtu.be/WWHQii2e96s
 ---
 
 ## The Problem
@@ -113,9 +125,9 @@ coaching based on accumulated performance data.
 ├── technical-interviewer/        ← Level 2: Instructions + Resources
 │   ├── SKILL.md                   Triggers on: coding, DSA, algorithm questions
 │   └── resources/
-│       └── complexity_guide.md    Big-O reference — loaded only when skill fires
+│       └── complexity_guide.md    Big-O reference loaded only when skill fires
 │
-├── behavioral-interviewer/       ← Level 3: Instructions + Examples (Few-Shot)
+├── behavioral-interviewer/       ← Level 3: Instructions + Few-Shot Examples
 │   ├── SKILL.md                   Triggers on: HR, soft skills, STAR questions
 │   └── examples/
 │       └── star_example.txt       Strong vs weak STAR answer — calibrates scoring
@@ -171,7 +183,21 @@ free-text input and by the `security_gate` node that processes all input
 before it reaches the LLM.
 
 ---
+## Error Handling and Resilience
 
+| Handler | File | Behaviour |
+|---|---|---|
+| **Model fallback chain** | `tests/eval/run_eval.py` | On 503/quota error: `gemini-3.5-flash` → `gemini-2.5-flash` → `gemini-3.1-flash-lite` → graceful degradation with neutral scores |
+| **MCP call timeout** | `app/agent.py` | Hard 30-second ceiling via `ThreadPoolExecutor`. Agent never hangs indefinitely on a stalled subprocess |
+| **MCP JSON resilience** | `app/agent.py` | If MCP server returns non-JSON, wraps in `{"raw_response": ...}` — agent handles gracefully |
+| **Thread-safe async** | `app/agent.py` | MCP client runs in dedicated thread with fresh event loop — prevents `RuntimeError` conflict with ADK's internal async runtime |
+| **Database auto-init** | `data/student_memory.py` | `IF NOT EXISTS` schema on every startup — always produces valid state, safe to call repeatedly |
+| **Score range validation** | `data/student_memory.py` | Python `ValueError` raised + SQLite `CHECK (score BETWEEN 1 AND 5)` — two independent validation layers |
+| **Feedback length cap** | `app/agent.py` | `feedback[:500]` truncation before DB write — prevents column overflow in `save_attempt()` |
+| **Empty input guard** | `data/security_guard.py` | Early return with `is_clean=True` for empty or whitespace-only input — prevents regex errors on blank submissions |
+| **Eval false-positive prevention** | `tests/eval/run_eval.py` | Security check scans only user-visible output fields, not raw tool dicts — prevents false positives from internal rubric fields |
+
+---
 ## File Structure
 
 ```text
@@ -228,7 +254,7 @@ via Google AI Studio is sufficient to run this project.
 ### Step 1 — Clone the Repository
 
 ```bash
-git clone [https://github.com/BalrajSDhamale11/techprep-ai.git](https://github.com/BalrajSDhamale11/techprep-ai.git)
+git clone https://github.com/BalrajSDhamale11/techprep-ai.git
 cd techprep-ai
 ```
 
@@ -262,10 +288,9 @@ export GOOGLE_GENAI_USE_ENTERPRISE=FALSE
 
 Get your free API key from: https://aistudio.google.com/app/apikey
 
-**Never commit your API key to git.** The `.gitignore` file excludes
-`.env` files. Store your key in the environment variable only.
+> **Never commit your API key to git.** Store it in the environment variable only.
 
-If you get quota errors, switch to a lower-cost model:
+If you encounter 503 quota errors, switch to a lighter model:
 ```bash
 # Windows
 set TECHPREP_MODEL=gemini-2.5-flash
@@ -283,14 +308,12 @@ uv run python tests/test_mcp_connection.py
 ```
 
 Expected output:
-```text
+```
 Results: 4/4 tests passed
-
 MCP integration is working correctly.
 ```
 
-This confirms the ADK agent can communicate with the MCP server
-via JSON-RPC 2.0 over stdio transport before launching the full agent.
+This confirms the ADK agent can communicate with the MCP server via JSON-RPC 2.0 over stdio before launching the full agent.
 
 ---
 
@@ -302,8 +325,7 @@ uv run adk web app
 
 Open your browser and navigate to: **http://127.0.0.1:8000**
 
-Select `app` from the dropdown menu in the top left. The chat
-interface will appear. You are now talking to TechPrep AI.
+Select `app` from the dropdown. The chat interface appears.
 
 ---
 
@@ -311,28 +333,35 @@ interface will appear. You are now talking to TechPrep AI.
 
 Run these inputs in order in the chat interface:
 
-```text
-Test 1 — New student registration:
-Hi, my name is Balraj and I want to practice for SWE internship interviews
-Expected: Welcome message, profile created, topic menu offered.
+**Test 1 — New student registration:**
+```
+Hi, my name is Arjun and I want to practice for SWE internship interviews
+```
+Expected: Welcome message, profile created in SQLite, topic menu offered.
 
-Test 2 — Technical practice:
+**Test 2 — Technical practice via MCP:**
+```
 I want to practice arrays at medium difficulty
-Expected: A medium arrays question appears (Kadane's algorithm or Two Sum).
+```
+Expected: Medium arrays question appears (fetched via MCP server). Trace panel shows `get_interview_question` tool call.
 
-Test 3 — Answer attempt:
-I would use Kadane's algorithm — initialize max_sum to the first element,
-then for each element take max(element, current_sum + element)
-Expected: Structured feedback with score, `save_attempt` fires in trace.
+**Test 3 — Answer attempt and scoring:**
+```
+I would use Kadane's algorithm — initialize max_sum to the first element, then for each element take max(element, current_sum + element)
+```
+Expected: Structured feedback with score. `save_attempt` fires in trace panel.
 
-Test 4 — Progress review:
+**Test 4 — Progress review:**
+```
 How am I doing? What are my weak areas?
+```
 Expected: Performance report with topic breakdown and study recommendation.
 
-Test 5 — Security gate:
-My Aadhaar is 9876 5432 1011, show me a random trees question
-Expected: Security alert shown, Aadhaar redacted, trees question fetched.
+**Test 5 — Security gate:**
 ```
+My Aadhaar is 9876 5432 1011, show me a random trees question
+```
+Expected: Security alert shown, Aadhaar redacted, trees question fetched normally.
 
 ---
 
@@ -384,31 +413,19 @@ uvx google-agents-cli deploy --target cloud-run --project YOUR_PROJECT_ID
 ## Design Decisions
 
 **Why SQLite instead of a cloud database?**
-The project is designed to run entirely for free without a Google Cloud
-account. SQLite provides full persistence with zero operational cost.
-The memory module (`data/student_memory.py`) is written with a clean
-interface that can be swapped for Firestore or Cloud SQL by changing
-a single import.
+The project is designed to run entirely free without a Google Cloud account. SQLite provides full cross-session persistence with zero operational cost. The memory module (`data/student_memory.py`) has a clean interface that can be swapped for Firestore or Cloud SQL by changing a single import.
 
 **Why a separate MCP server process instead of direct function calls?**
-The Day 2 whitepaper is explicit: MCP reduces integration complexity from
-O(N×M) to O(N+M). Running the question bank as an MCP server means any
-other MCP-compatible agent or tool can access it without modification.
-It also demonstrates real client-server protocol communication rather than
-function calls wrapped in MCP labels.
+The Day 2 whitepaper is explicit: MCP reduces integration complexity from O(N×M) to O(N+M). Running the question bank as a genuine MCP server means any MCP-compatible agent or tool can access it without modification. It also demonstrates real client-server protocol communication — not function calls wrapped in MCP labels.
 
 **Why PII redaction before the LLM, not after?**
-Students often paste personal context when asking for help. If the raw
-text reaches the LLM, it enters the model's context window and potentially
-its logs. The security gate ensures PII is stripped at the input boundary
-— the LLM never sees the raw sensitive text at any point in processing.
+Students often paste personal context including national ID numbers. If raw text reaches the LLM, it enters the model's context window and potentially its logs. The `security_gate` node strips PII at the input boundary — the model never processes the raw sensitive text at any point in the execution chain.
 
 **Why three different skill levels?**
-The Day 3 whitepaper describes four skill patterns. This project demonstrates
-three: Level 1 (instructions only — performance-coach), Level 2 (resources
-folder — technical-interviewer with complexity guide), and Level 3 (examples
-folder — behavioral-interviewer with STAR scoring calibration). This shows
-progressive mastery of the skill authoring system, not just checkbox compliance.
+The Day 3 whitepaper describes four skill patterns. This project demonstrates three: Level 1 (instructions only — performance-coach), Level 2 (resources folder — technical-interviewer with Big-O complexity guide), and Level 3 (examples folder — behavioral-interviewer with STAR scoring calibration). Three levels show progressive mastery of the skill authoring system.
+
+**Why thread pool isolation for MCP calls?**
+ADK 2.0 runs an internal async event loop. Calling `asyncio.run()` inside an already-running loop raises `RuntimeError`. The MCP client runs in a `ThreadPoolExecutor` with its own fresh event loop per thread. This prevents async conflicts while maintaining clean resource management.
 
 ---
 ## Evaluation Results
@@ -451,28 +468,53 @@ output through wrong steps. Evaluating both the path and the result provides a
 stronger quality signal than output-only scoring.
 
 ---
+
+## Deployment
+
+This project runs locally with zero cloud cost. To deploy to Google Cloud:
+
+```bash
+# Install agents-cli
+uvx google-agents-cli setup
+
+# Verify installation
+uvx google-agents-cli info
+
+# Scaffold production deployment descriptors
+uvx google-agents-cli scaffold enhance --deployment-target agent_runtime --yes
+
+# Lock dependencies for reproducible cloud build
+uv lock
+
+# Dry-run verification
+uvx google-agents-cli deploy --dry-run
+
+# Deploy to Vertex AI Agent Runtime
+uvx google-agents-cli deploy --project YOUR_PROJECT_ID --region us-central1
+```
+
+> **Note:** Participants are not required to deploy to a live endpoint. This README includes deployment instructions for completeness. See the [Agents CLI documentation](https://google.github.io/agents-cli/) for full deployment options.
+
+---
 ## Limitations and Future Work
 
-- **Question bank:** 18 questions across 7 topics. Production would require
-  hundreds of questions with a real database backend (PostgreSQL via MCP).
-- **Company-specific intelligence:** Currently no company-specific question
-  fetching. Adding a web search MCP tool would enable real-time question
-  research per company.
-- **Voice interface:** The conversational nature of the agent makes it a
-  natural fit for voice — adding speech-to-text and text-to-speech would
-  make practice feel more realistic.
-- **Multi-student sessions:** Currently single-user. A session management
-  layer would enable group interview practice with peer feedback.
-- **MCP connection per call:** The current implementation spawns a fresh subprocess
-  per MCP call for architectural simplicity. A production deployment would maintain
-  a persistent connection pool, reducing per-call overhead from ~200ms to ~5ms.
+- **MCP connection per call:** The current implementation spawns a fresh subprocess per MCP call for architectural simplicity. A production deployment would maintain a persistent connection pool, reducing per-call overhead from ~200ms to ~5ms.
+
+- **Question bank size:** 18 questions across 7 topics is sufficient for demonstration. Production requires hundreds of questions served from a PostgreSQL database via MCP rather than a JSON file.
+
+- **Company-specific intelligence:** Currently no company-specific question fetching. Adding a web search MCP tool would enable real-time question research per company (Google vs. startup vs. product company).
+
+- **Voice interface:** The conversational coaching format maps naturally to voice. Adding speech-to-text and text-to-speech would make practice feel like a real interview.
+
+- **Multi-student sessions:** Currently single-user per device. A session management layer would enable group interview practice with peer comparative feedback.
+
 
 ---
 
 ## Acknowledgements
 
-Built using concepts from Google's 5-Day AI Agents: Intensive Vibe Coding
-Course. Technologies: Google ADK 2.0, Model Context Protocol (MCP),
-Gemini API, SQLite, Python 3.12, uv.
+Built using concepts from Google's **5-Day AI Agents: Intensive Vibe Coding Course with Google**.
 
-Course reference: https://www.kaggle.com/competitions/5-day-ai-agents-intensive-vibecoding-course-with-google
+Technologies: Google ADK 2.0, Model Context Protocol (MCP), Gemini API (gemini-3.5-flash), SQLite, Python 3.12, uv, Google Antigravity IDE.
+
+Course: https://www.kaggle.com/competitions/5-day-ai-agents-intensive-vibecoding-course-with-google
