@@ -385,31 +385,6 @@ The server exposes four tools:
 
 ---
 
-## Deployment
-
-This project runs locally. To deploy to Google Cloud:
-
-```bash
-# Install agents-cli (requires Node.js)
-uvx google-agents-cli setup
-
-# Verify installation
-uvx google-agents-cli info
-
-# Scaffold deployment descriptors
-uvx google-agents-cli scaffold enhance --deployment-target agent_runtime --yes
-
-# Deploy to Vertex AI Agent Runtime
-uvx google-agents-cli deploy --project YOUR_PROJECT_ID --region us-central1
-```
-
-For Cloud Run deployment (simpler, no managed sessions):
-```bash
-uvx google-agents-cli deploy --target cloud-run --project YOUR_PROJECT_ID
-```
-
----
-
 ## Design Decisions
 
 **Why SQLite instead of a cloud database?**
@@ -493,7 +468,7 @@ uvx google-agents-cli deploy --dry-run
 uvx google-agents-cli deploy --project YOUR_PROJECT_ID --region us-central1
 ```
 
-> **Note:** Participants are not required to deploy to a live endpoint. This README includes deployment instructions for completeness. See the [Agents CLI documentation](https://google.github.io/agents-cli/) for full deployment options.
+> **Note:** Deploying to a live endpoint is optional. This README includes deployment instructions for completeness. See the [Agents CLI documentation](https://google.github.io/agents-cli/) for full deployment options.
 
 ---
 ## Limitations and Future Work
